@@ -2,7 +2,7 @@
     "id": "your-micro-app",
     "code": "your-micro-app",
     "name": "示例微应用",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "enabled": true,
     "kind": "micro-app",
     "runtime": "wujie",
@@ -30,6 +30,6 @@
         "settings": false
     },
     "compatibility": {
-        "console": ">=0.1.1"
+        "console": ">=0.1.2"
     }
 }
