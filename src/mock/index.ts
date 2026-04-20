@@ -55,6 +55,7 @@ export const mockMicroAppSDK: HostSdk = defineHostSdk({
     },
     request: {
         raw: async <T>(config: Record<string, any>) => config as T,
+        sse: async () => [],
         get: async <T>(url: string, params?: Record<string, any>) => ({ code: 0, url, params }) as T,
         post: async <T>(url: string, data?: Record<string, any>) => ({ code: 0, url, data }) as T,
         put: async <T>(url: string, data?: Record<string, any>) => ({ code: 0, url, data }) as T,
