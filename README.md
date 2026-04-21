@@ -7,7 +7,7 @@
 - 插件本身是一套完整独立页面或独立系统
 - 通过 `wujie` 方式挂入 `console`
 - 希望复用宿主的 `Host SDK`
-- 不需要输出 `routes / pages / widgets` 这类模块协议能力
+- 不需要输出模块页面、widget 这类模块协议能力
 
 如果你的目标只是做一个后台业务模块，请不要使用这个模板，应改用 `templates/plugin-module`。
 
@@ -15,16 +15,35 @@
 
 微应用型插件的核心边界不是模块协议，而是：
 
+- `manifest.json`
+- `frontend.config.json`
 - `frontend.json`
 - `Host SDK`
 - `wujie` 挂载协议
+
+其中公共元数据只维护一份：
+
+- `manifest.json`
+  作为插件公共元数据唯一来源，前后端共享 `code / name / version / description / type`
+
+- `frontend.config.json`
+  只维护前端宿主加载所需的运行时配置
+
+- `frontend.json`
+  由脚本根据 `manifest.json + frontend.config.json` 自动同步生成，不再手工维护
 
 也就是说，这类插件更像“独立前端应用”，只是运行时嵌入到了宿主里。
 
 ## 目录结构
 
+- `manifest.json`
+  插件公共元数据源。前后端共享 `code / name / version / description / type` 等字段。
+
+- `frontend.config.json`
+  微应用加载配置源。这里只维护 runtime、routeBase、wujie entry、icon、宿主兼容性等前端专属字段。
+
 - `frontend.json`
-  微应用前端清单，宿主依赖它识别和加载插件
+  自动生成的微应用前端清单，宿主依赖它识别和加载插件。
 
 - `src/main.ts`
   微应用入口
@@ -38,8 +57,11 @@
 - `src/mock/`
   本地 standalone 开发时的 mock 宿主能力
 
+- `scripts/manifest-sync.mjs`
+  根据 `manifest.json + frontend.config.json` 自动同步 `frontend.json`
+
 - `scripts/manifest-check.mjs`
-  校验 `frontend.json`
+  校验清单结构与同步结果
 
 - `scripts/manifest-print.mjs`
   打印标准化后的 manifest，便于联调复制
@@ -62,25 +84,28 @@ pnpm dev
 ```
 
 此时不会依赖真实宿主，而是使用模板内置的 mock host。
+执行 `pnpm dev / build / check:types / pack` 时，模板会先自动同步一次 `frontend.json` 和 `package.json.version`。
 
 ### 3. 先改这几个地方
 
 开始写业务前，优先修改：
 
 1. `package.json`
-   确认包名、版本号
+   确认包名
 
-2. `frontend.json`
+2. `manifest.json`
    确认：
-   - `id`
    - `code`
    - `name`
+   - `version`
+   - `description`
+   - `type`
+
+3. `frontend.config.json`
+   确认：
    - `routeBase`
    - `entry.wujie.name`
    - `entry.wujie.url`
-
-3. `src/mock/index.ts`
-   把默认 manifest 和默认路径替换成你的插件值
 
 4. `src/app.vue`
    把模板示例页面替换成真实业务页面
@@ -126,7 +151,7 @@ pnpm manifest:print
 
 ### 4. 把 `frontend.json` 注册到宿主
 
-当前阶段仍然是手动联调，把你的清单登记到宿主 manifest 注册表。
+当前阶段仍然是手动联调，把自动生成的 `frontend.json` 登记到宿主 manifest 注册表。
 
 ### 5. 在宿主里打开路由
 
@@ -155,6 +180,8 @@ pnpm manifest:check
 
 它会校验：
 
+- `manifest.json` 是否结构正确
+- `frontend.config.json` 是否可生成有效清单
 - `frontend.json` 是否结构正确
 - `kind` 是否为 `micro-app`
 - `runtime` 是否为 `wujie`
@@ -202,6 +229,7 @@ release/your-micro-app-0.1.0.zip
 压缩包中默认包含：
 
 - `dist/`
+- `manifest.json`
 - `frontend.json`
 - `package.json`
 - `README.md`
@@ -212,6 +240,7 @@ release/your-micro-app-0.1.0.zip
 至少要保证下面这些内容是正确的：
 
 - 打包产物 `.zip`
+- `manifest.json`
 - `frontend.json`
 - 正确的 `code`
 - 正确的 `routeBase`
@@ -223,6 +252,7 @@ release/your-micro-app-0.1.0.zip
 ## 六、常用命令
 
 ```bash
+pnpm manifest:sync
 pnpm dev
 pnpm check:types
 pnpm build

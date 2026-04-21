@@ -1,46 +1,13 @@
 import type { HostSdk } from '@pangtou/host-sdk'
 import { defineHostSdk } from '@pangtou/host-sdk'
 import type { FrontendManifest } from '@pangtou/shared'
+import frontendManifest from '../../frontend.json'
 
 /**
  * 独立开发时使用的默认 frontend manifest。
- * 结构和正式接入宿主时的 frontend.json 保持一致，方便对照修改。
+ * 这里直接读取根目录的 frontend.json，避免独立预览和正式接入出现两份元数据。
  */
-export const mockMicroAppManifest: FrontendManifest = {
-    id: 'your-micro-app',
-    code: 'your-micro-app',
-    name: '示例微应用',
-    version: '0.1.0',
-    enabled: true,
-    kind: 'micro-app',
-    runtime: 'wujie',
-    routeBase: '/your-micro-app',
-    meta: {
-        icon: 'Monitor',
-        description: '用于演示 Pangtou 微应用插件脚手架的最小实现。',
-        order: 100,
-        develop: true,
-        preload: false,
-    },
-    entry: {
-        wujie: {
-            name: 'your_micro_app',
-            url: 'http://localhost:5182/',
-            alive: true,
-            degrade: false,
-            sync: true,
-        },
-    },
-    capabilities: {
-        routes: false,
-        pages: false,
-        widgets: false,
-        settings: false,
-    },
-    compatibility: {
-        console: '>=0.1.0',
-    },
-}
+export const mockMicroAppManifest: FrontendManifest = frontendManifest as FrontendManifest
 
 /**
  * 独立预览时的 mock 宿主。
