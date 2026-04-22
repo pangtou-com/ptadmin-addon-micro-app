@@ -2,7 +2,7 @@
     "id": "your-micro-app",
     "code": "your-micro-app",
     "name": "示例微应用",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "develop": true,
     "type": "micro-app",
     "description": "用于演示微应用插件脚手架的最小实现。",
